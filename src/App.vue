@@ -141,16 +141,8 @@ onMounted(() => {
           },
         ],
         onSelect: function (item) {
-          subtitleOctopus.value.setSubUrl(item.url);
           const newSubtitleUrl = item.url;
-          subtitleOctopus.value.dispose();
-          subtitleOctopus.value = new SubtitlesOctopus({
-            fonts: fonts,
-            subUrl: newSubtitleUrl,
-            workerUrl: `/src/assets/js/JavascriptSubtitlesOctopus/subtitles-octopus-worker.js`,
-            video: art.value?.template.$video,
-          });
-          subtitleOctopus.value.canvasParent.style.zIndex = 20;
+          subtitleOctopus.value.setTrackByUrl(newSubtitleUrl);
           return item.html;
         },
       },
