@@ -4,4 +4,10 @@ import vue from '@vitejs/plugin-vue'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
+  server: {
+    proxy: {
+      '^/files/': 'http://localhost:9999',
+      '^/static/fonts/': 'http://localhost:9999'
+    },
+  },
 })

@@ -1,19 +1,21 @@
 <script setup lang="ts">
-import Artplayer from "artplayer";
 import { onMounted, onUnmounted, ref } from "vue";
+import Artplayer from "artplayer";
+import SubtitlesOctopus from "./assets/js/JavascriptSubtitlesOctopus/subtitles-octopus";
 
 var video = {
-  url: "http://localhost:9999/files/2023/11/23/f6c66840fb3b4ff5ba38afca3639f993.mkv",
+  url: "/files/2023/11/23/f6c66840fb3b4ff5ba38afca3639f993.mkv",
   poster: "",
+  // ass subtitles support: https://github.com/zhw2590582/ArtPlayer/issues/239#issuecomment-1060243794
   subtitles: [
     {
       name: "简中",
-      url: "http://localhost:9999/files/2023/11/23/6c0d3706c6314e6892cccff546f1c220.ass",
+      url: "/files/2023/11/23/6c0d3706c6314e6892cccff546f1c220.ass",
       default: true,
     },
     {
       name: "繁中",
-      url: "http://localhost:9999/files/2023/11/23/6fbaa102588a47bb839df7d98ec2f450.ass",
+      url: "/files/2023/11/23/6fbaa102588a47bb839df7d98ec2f450.ass",
       default: false,
     },
   ],
@@ -21,6 +23,31 @@ var video = {
 
 var artRef = ref();
 var art = ref<Artplayer>();
+
+function artplayerPluginAss(options: any) {
+  return (art: any) => {
+    const instance = new SubtitlesOctopus({
+      ...options,
+      video: art.template.$video,
+    });
+
+    instance.canvasParent.style.zIndex = 20;
+    art.on("destroy", () => instance.dispose());
+
+    art.on("subtitleSwitch", (url: any) => {
+      console.info("subtitleSwitch", url);
+      instance.setSubUrl(url);
+      console.info("instance", instance);
+      console.info("instance subUrl", instance.subUrl);
+    });
+
+    return {
+      name: "artplayerPluginAss",
+      instance: instance,
+    };
+  };
+}
+
 onMounted(() => {
   art.value = new Artplayer({
     container: artRef.value,
@@ -53,19 +80,54 @@ onMounted(() => {
     moreVideoAttr: {
       crossOrigin: "anonymous",
     },
+    plugins: [
+      artplayerPluginAss({
+        // debug: true,
+        fonts: [
+          "/static/fonts/A-OTF-Jun34Pro-Medium.otf",
+          "/static/fonts/DFHanziPen-W5 & DFPHanziPen-W5 & DFGHanziPen-W5.ttc",
+          "/static/fonts/DFMaruMoji-SL & DFPMaruMoji-SL & DFGMaruMoji-SL.ttc",
+          "/static/fonts/FOT-SeuratProN-M.otf",
+          "/static/fonts/FZLanTYK_Zhun.TTF",
+          "/static/fonts/华康少女文字W5 & 华康少女文字W5(P).ttc",
+          "/static/fonts/华康翩翩体W5 & 华康翩翩体W5P.ttc",
+          "/static/fonts/方正兰亭中黑_GBK.ttf",
+          "/static/fonts/方正兰亭圆_GBK.ttf",
+          "/static/fonts/方正兰亭圆_GBK_粗.ttf",
+          "/static/fonts/方正兰亭粗黑_GBK.ttf",
+          "/static/fonts/方正兰亭细黑_GBK.ttf",
+          "/static/fonts/方正兰亭黑_GBK.ttf",
+          "/static/fonts/方正准圆_GBK.TTF",
+          "/static/fonts/方正准雅宋_GBK.ttf",
+          "/static/fonts/方正剪纸_GBK.ttf",
+          "/static/fonts/方正喵鸣.ttf",
+          "/static/fonts/方正康体_GBK.ttf",
+          "/static/fonts/方正粗圆_GBK.TTF",
+          "/static/fonts/方正粗雅宋_GBK.ttf",
+          "/static/fonts/方正细圆_GBK.ttf",
+          "/static/fonts/方正行楷_GBK.ttf",
+          "/static/fonts/方正隶变_GBK.ttf",
+          "/static/fonts/華康少女文字W5 & 華康少女文字W5(P).ttc",
+          "/static/fonts/華康翩翩體W5 & 華康翩翩體W5P.ttc",
+          "/static/fonts/萝莉体-DDC.yolan 常规.ttf",
+        ],
+        subUrl: video.subtitles[0].url,
+        workerUrl: `/src/assets/js/JavascriptSubtitlesOctopus/subtitles-octopus-worker.js`,
+      }),
+    ],
     settings: [
       {
         width: 200,
-        html: "Subtitle",
-        tooltip: "Bilingual",
+        html: "字幕",
+        tooltip: "选择",
         // icon: '<img width="22" heigth="22" src="/assets/img/subtitle.svg">',
         selector: [
           {
-            html: "Display",
-            tooltip: "Show",
+            html: "开启",
+            tooltip: "显示",
             switch: true,
             onSwitch: function (item) {
-              item.tooltip = item.switch ? "Hide" : "Show";
+              item.tooltip = item.switch ? "隐藏" : "显示";
               art.value!.subtitle.show = !item.switch;
               return !item.switch;
             },
@@ -90,7 +152,7 @@ onMounted(() => {
       },
       {
         html: "Switcher",
-        icon: '<img width="22" heigth="22" src="/assets/img/state.svg">',
+        // icon: '<img width="22" heigth="22" src="/assets/img/state.svg">',
         tooltip: "OFF",
         switch: false,
         onSwitch: function (item) {
@@ -101,7 +163,7 @@ onMounted(() => {
       },
       {
         html: "Slider",
-        icon: '<img width="22" heigth="22" src="/assets/img/state.svg">',
+        // icon: '<img width="22" heigth="22" src="/assets/img/state.svg">',
         tooltip: "5x",
         range: [5, 1, 10, 0.1],
         onRange: function (item) {
@@ -135,51 +197,51 @@ onMounted(() => {
     // ],
     quality: [
       {
-        default: true,
         html: "SD 480P",
         url: video.url,
       },
       {
+        default: true,
         html: "HD 720P",
         url: video.url,
       },
     ],
-    thumbnails: {
-      url: "/assets/sample/thumbnails.png",
-      number: 60,
-      column: 10,
-    },
-    subtitle: {
-      url: "/assets/sample/subtitle.srt",
-      type: "srt",
-      style: {
-        color: "#fe9200",
-        fontSize: "20px",
-      },
-      encoding: "utf-8",
-    },
-    highlight: [
-      {
-        time: 15,
-        text: "One more chance",
-      },
-      {
-        time: 30,
-        text: "谁でもいいはずなのに",
-      },
-      {
-        time: 45,
-        text: "夏の想い出がまわる",
-      },
-      {
-        time: 60,
-        text: "こんなとこにあるはずもないのに",
-      },
-      {
-        time: 75,
-        text: "终わり",
-      },
-    ],
+    // thumbnails: {
+    //   url: "/assets/sample/thumbnails.png",
+    //   number: 60,
+    //   column: 10,
+    // },
+    // subtitle: {
+    //   url: "/assets/sample/subtitle.srt",
+    //   type: "srt",
+    //   style: {
+    //     color: "#fe9200",
+    //     fontSize: "20px",
+    //   },
+    //   encoding: "utf-8",
+    // },
+    // highlight: [
+    //   {
+    //     time: 15,
+    //     text: "One more chance",
+    //   },
+    //   {
+    //     time: 30,
+    //     text: "谁でもいいはずなのに",
+    //   },
+    //   {
+    //     time: 45,
+    //     text: "夏の想い出がまわる",
+    //   },
+    //   {
+    //     time: 60,
+    //     text: "こんなとこにあるはずもないのに",
+    //   },
+    //   {
+    //     time: 75,
+    //     text: "终わり",
+    //   },
+    // ],
     controls: [
       {
         position: "right",
@@ -209,7 +271,15 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="artRef"></div>
+  <div align="center">
+    <!-- <video :src="video.url" controls style="max-height: 400px"></video> -->
+
+    <!-- <hr /> -->
+
+    <div style="width: 70%; min-height: 500px">
+      <div ref="artRef" style="width: 100%; height: 700px"></div>
+    </div>
+  </div>
 </template>
 
 <style scoped></style>
