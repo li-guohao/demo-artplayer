@@ -21,10 +21,40 @@ var video = {
   ],
 };
 
+var fonts = [
+  "/static/fonts/A-OTF-Jun34Pro-Medium.otf",
+  "/static/fonts/DFHanziPen-W5 & DFPHanziPen-W5 & DFGHanziPen-W5.ttc",
+  "/static/fonts/DFMaruMoji-SL & DFPMaruMoji-SL & DFGMaruMoji-SL.ttc",
+  "/static/fonts/FOT-SeuratProN-M.otf",
+  "/static/fonts/FZLanTYK_Zhun.TTF",
+  "/static/fonts/华康少女文字W5 & 华康少女文字W5(P).ttc",
+  "/static/fonts/华康翩翩体W5 & 华康翩翩体W5P.ttc",
+  "/static/fonts/方正兰亭中黑_GBK.ttf",
+  "/static/fonts/方正兰亭圆_GBK.ttf",
+  "/static/fonts/方正兰亭圆_GBK_粗.ttf",
+  "/static/fonts/方正兰亭粗黑_GBK.ttf",
+  "/static/fonts/方正兰亭细黑_GBK.ttf",
+  "/static/fonts/方正兰亭黑_GBK.ttf",
+  "/static/fonts/方正准圆_GBK.TTF",
+  "/static/fonts/方正准雅宋_GBK.ttf",
+  "/static/fonts/方正剪纸_GBK.ttf",
+  "/static/fonts/方正喵鸣.ttf",
+  "/static/fonts/方正康体_GBK.ttf",
+  "/static/fonts/方正粗圆_GBK.TTF",
+  "/static/fonts/方正粗雅宋_GBK.ttf",
+  "/static/fonts/方正细圆_GBK.ttf",
+  "/static/fonts/方正行楷_GBK.ttf",
+  "/static/fonts/方正隶变_GBK.ttf",
+  "/static/fonts/華康少女文字W5 & 華康少女文字W5(P).ttc",
+  "/static/fonts/華康翩翩體W5 & 華康翩翩體W5P.ttc",
+  "/static/fonts/萝莉体-DDC.yolan 常规.ttf",
+];
+
 var artRef = ref();
 var art = ref<Artplayer>();
+const subtitleOctopus = ref<SubtitlesOctopus>();
 
-function artplayerPluginAss(options: any) {
+const artplayerPluginAss = (options: any) => {
   return (art: any) => {
     const instance = new SubtitlesOctopus({
       ...options,
@@ -34,19 +64,13 @@ function artplayerPluginAss(options: any) {
     instance.canvasParent.style.zIndex = 20;
     art.on("destroy", () => instance.dispose());
 
-    art.on("subtitleSwitch", (url: any) => {
-      console.info("subtitleSwitch", url);
-      instance.setSubUrl(url);
-      console.info("instance", instance);
-      console.info("instance subUrl", instance.subUrl);
-    });
-
+    subtitleOctopus.value = instance;
     return {
       name: "artplayerPluginAss",
       instance: instance,
     };
   };
-}
+};
 
 onMounted(() => {
   art.value = new Artplayer({
@@ -83,34 +107,7 @@ onMounted(() => {
     plugins: [
       artplayerPluginAss({
         // debug: true,
-        fonts: [
-          "/static/fonts/A-OTF-Jun34Pro-Medium.otf",
-          "/static/fonts/DFHanziPen-W5 & DFPHanziPen-W5 & DFGHanziPen-W5.ttc",
-          "/static/fonts/DFMaruMoji-SL & DFPMaruMoji-SL & DFGMaruMoji-SL.ttc",
-          "/static/fonts/FOT-SeuratProN-M.otf",
-          "/static/fonts/FZLanTYK_Zhun.TTF",
-          "/static/fonts/华康少女文字W5 & 华康少女文字W5(P).ttc",
-          "/static/fonts/华康翩翩体W5 & 华康翩翩体W5P.ttc",
-          "/static/fonts/方正兰亭中黑_GBK.ttf",
-          "/static/fonts/方正兰亭圆_GBK.ttf",
-          "/static/fonts/方正兰亭圆_GBK_粗.ttf",
-          "/static/fonts/方正兰亭粗黑_GBK.ttf",
-          "/static/fonts/方正兰亭细黑_GBK.ttf",
-          "/static/fonts/方正兰亭黑_GBK.ttf",
-          "/static/fonts/方正准圆_GBK.TTF",
-          "/static/fonts/方正准雅宋_GBK.ttf",
-          "/static/fonts/方正剪纸_GBK.ttf",
-          "/static/fonts/方正喵鸣.ttf",
-          "/static/fonts/方正康体_GBK.ttf",
-          "/static/fonts/方正粗圆_GBK.TTF",
-          "/static/fonts/方正粗雅宋_GBK.ttf",
-          "/static/fonts/方正细圆_GBK.ttf",
-          "/static/fonts/方正行楷_GBK.ttf",
-          "/static/fonts/方正隶变_GBK.ttf",
-          "/static/fonts/華康少女文字W5 & 華康少女文字W5(P).ttc",
-          "/static/fonts/華康翩翩體W5 & 華康翩翩體W5P.ttc",
-          "/static/fonts/萝莉体-DDC.yolan 常规.ttf",
-        ],
+        fonts: fonts,
         subUrl: video.subtitles[0].url,
         workerUrl: `/src/assets/js/JavascriptSubtitlesOctopus/subtitles-octopus-worker.js`,
       }),
@@ -144,9 +141,16 @@ onMounted(() => {
           },
         ],
         onSelect: function (item) {
-          art.value!.subtitle.switch(item.url, {
-            name: item.html,
+          subtitleOctopus.value.setSubUrl(item.url);
+          const newSubtitleUrl = item.url;
+          subtitleOctopus.value.dispose();
+          subtitleOctopus.value = new SubtitlesOctopus({
+            fonts: fonts,
+            subUrl: newSubtitleUrl,
+            workerUrl: `/src/assets/js/JavascriptSubtitlesOctopus/subtitles-octopus-worker.js`,
+            video: art.value?.template.$video,
           });
+          subtitleOctopus.value.canvasParent.style.zIndex = 20;
           return item.html;
         },
       },
