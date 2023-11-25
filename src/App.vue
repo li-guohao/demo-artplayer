@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 import Artplayer from "artplayer";
-import SubtitlesOctopus from "./assets/js/JavascriptSubtitlesOctopus/subtitles-octopus";
+import SubtitlesOctopus from "./libs/JavascriptSubtitlesOctopus/subtitles-octopus";
+
+const subtitlesOctopusWorkJsPath =
+  "/src/libs/JavascriptSubtitlesOctopus/subtitles-octopus-worker.js";
 
 var video = {
   url: "/files/2023/11/23/f6c66840fb3b4ff5ba38afca3639f993.mkv",
@@ -109,7 +112,7 @@ onMounted(() => {
         // debug: true,
         fonts: fonts,
         subUrl: video.subtitles[0].url,
-        workerUrl: `/src/assets/js/JavascriptSubtitlesOctopus/subtitles-octopus-worker.js`,
+        workerUrl: subtitlesOctopusWorkJsPath,
       }),
     ],
     settings: [
@@ -279,3 +282,4 @@ onUnmounted(() => {
 </template>
 
 <style scoped></style>
+./libs/JavascriptSubtitlesOctopus/subtitles-octopus
