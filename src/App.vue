@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 import Artplayer from "artplayer";
-import SubtitlesOctopus from "@/libs/JavascriptSubtitlesOctopus/subtitles-octopus.js";
+import SubtitlesOctopus from "@/assets/js/JavascriptSubtitlesOctopus/subtitles-octopus";
 
 const subtitlesOctopusWorkJsPath =
-  "/src/libs/JavascriptSubtitlesOctopus/subtitles-octopus-worker.js";
+  "/src/assets/js/JavascriptSubtitlesOctopus/subtitles-octopus-worker.js";
 
 var video = {
   url: "/files/2023/11/23/f6c66840fb3b4ff5ba38afca3639f993.mkv",
@@ -56,6 +56,7 @@ var fonts = [
 var artRef = ref();
 var art = ref<Artplayer>();
 const subtitleOctopus = ref();
+var tmpSubtitleOctopusSubUrl = "";
 
 const artplayerPluginAss = (options: any) => {
   return (art: any) => {
@@ -128,7 +129,21 @@ onMounted(() => {
             switch: true,
             onSwitch: function (item) {
               item.tooltip = item.switch ? "隐藏" : "显示";
-              art.value!.subtitle.show = !item.switch;
+              // art.value!.subtitle.show = !item.switch;
+              console.log("item", item);
+              console.log("subtitleOctopus", subtitleOctopus.value);
+
+              subtitleOctopus.value.show = !item.switch;
+              if (!item.switch) {
+                console.log(
+                  "tmpSubtitleOctopusSubUrl",
+                  tmpSubtitleOctopusSubUrl
+                );
+                subtitleOctopus.value.setTrackByUrl(tmpSubtitleOctopusSubUrl);
+              } else {
+                tmpSubtitleOctopusSubUrl = subtitleOctopus.value.subUrl;
+                subtitleOctopus.value.freeTrack();
+              }
               return !item.switch;
             },
           },
@@ -145,6 +160,7 @@ onMounted(() => {
         ],
         onSelect: function (item) {
           const newSubtitleUrl = item.url;
+          tmpSubtitleOctopusSubUrl = newSubtitleUrl;
           subtitleOctopus.value.setTrackByUrl(newSubtitleUrl);
           return item.html;
         },
@@ -170,10 +186,6 @@ onUnmounted(() => {
 
 <template>
   <div align="center">
-    <!-- <video :src="video.url" controls style="max-height: 400px"></video> -->
-
-    <!-- <hr /> -->
-
     <div style="width: 70%; min-height: 500px">
       <div ref="artRef" style="width: 100%; height: 700px"></div>
     </div>
@@ -181,4 +193,3 @@ onUnmounted(() => {
 </template>
 
 <style scoped></style>
-./libs/JavascriptSubtitlesOctopus/subtitles-octopus
