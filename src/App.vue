@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 import Artplayer from "artplayer";
-import SubtitlesOctopus from "./libs/JavascriptSubtitlesOctopus/subtitles-octopus";
+import SubtitlesOctopus from "@/libs/JavascriptSubtitlesOctopus/subtitles-octopus.js";
 
 const subtitlesOctopusWorkJsPath =
   "/src/libs/JavascriptSubtitlesOctopus/subtitles-octopus-worker.js";
@@ -55,7 +55,7 @@ var fonts = [
 
 var artRef = ref();
 var art = ref<Artplayer>();
-const subtitleOctopus = ref<SubtitlesOctopus>();
+const subtitleOctopus = ref();
 
 const artplayerPluginAss = (options: any) => {
   return (art: any) => {

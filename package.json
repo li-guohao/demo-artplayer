@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/node": "^20.10.0",
     "artplayer": "^5.0.9",
     "vue": "^3.3.8"
   },
