@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 export default defineConfig({
   plugins: [vue()],
   server: {
-    open: true,
+    open: false,
     port: 3000,
     proxy: {
       '^/files/': 'http://localhost:9999',
