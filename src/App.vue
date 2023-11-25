@@ -56,7 +56,7 @@ var fonts = [
 var artRef = ref();
 var art = ref<Artplayer>();
 const subtitleOctopus = ref();
-var tmpSubtitleOctopusSubUrl = "";
+const tmpSubtitleOctopusSubUrl = ref("");
 
 const artplayerPluginAss = (options: any) => {
   return (art: any) => {
@@ -121,7 +121,7 @@ onMounted(() => {
         width: 200,
         html: "字幕",
         tooltip: "选择",
-        // icon: '<img width="22" heigth="22" src="/assets/img/subtitle.svg">',
+        icon: '<img width="22" heigth="22" src="/svg/subtitle.svg">',
         selector: [
           {
             html: "开启",
@@ -130,19 +130,14 @@ onMounted(() => {
             onSwitch: function (item) {
               item.tooltip = item.switch ? "隐藏" : "显示";
               // art.value!.subtitle.show = !item.switch;
-              console.log("item", item);
-              console.log("subtitleOctopus", subtitleOctopus.value);
-
-              subtitleOctopus.value.show = !item.switch;
-              if (!item.switch) {
-                console.log(
-                  "tmpSubtitleOctopusSubUrl",
-                  tmpSubtitleOctopusSubUrl
-                );
-                subtitleOctopus.value.setTrackByUrl(tmpSubtitleOctopusSubUrl);
-              } else {
-                tmpSubtitleOctopusSubUrl = subtitleOctopus.value.subUrl;
+              if (item.switch) {
+                tmpSubtitleOctopusSubUrl.value = subtitleOctopus.value.subUrl;
                 subtitleOctopus.value.freeTrack();
+              } else {
+                subtitleOctopus.value.setTrackByUrl(
+                  tmpSubtitleOctopusSubUrl.value
+                );
+                subtitleOctopus.value.setSubUrl(tmpSubtitleOctopusSubUrl.value);
               }
               return !item.switch;
             },
@@ -160,8 +155,9 @@ onMounted(() => {
         ],
         onSelect: function (item) {
           const newSubtitleUrl = item.url;
-          tmpSubtitleOctopusSubUrl = newSubtitleUrl;
+          tmpSubtitleOctopusSubUrl.value = newSubtitleUrl;
           subtitleOctopus.value.setTrackByUrl(newSubtitleUrl);
+          subtitleOctopus.value.setSubUrl(newSubtitleUrl);
           return item.html;
         },
       },
