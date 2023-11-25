@@ -6,6 +6,8 @@ import { fileURLToPath } from 'url';
 export default defineConfig({
   plugins: [vue()],
   server: {
+    open: true,
+    port: 3000,
     proxy: {
       '^/files/': 'http://localhost:9999',
       '^/static/fonts/': 'http://localhost:9999'
